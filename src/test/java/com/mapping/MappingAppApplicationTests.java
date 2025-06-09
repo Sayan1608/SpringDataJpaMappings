@@ -48,4 +48,32 @@ class MappingAppApplicationTests {
 		t2.join();
 	}
 
+	@Test
+	public void testConcurrentBookingPessimistic() throws InterruptedException {
+		Thread t1 = new Thread(()->{
+			try {
+				System.out.println(Thread.currentThread().getName() + " attempting to book seat pessimistically");
+				bookingService.bookSeatUsingPessimisticLock(6L,1L);
+				System.out.println(Thread.currentThread().getName() + " successfully booked seat pessimistically");
+			} catch (Exception e) {
+				System.out.println(Thread.currentThread().getName() + " failed to book seat pessimistically : " + e.getMessage());
+			}
+		});
+
+		Thread t2 = new Thread(()->{
+			try {
+				System.out.println(Thread.currentThread().getName() + " attempting to book seat pessimistically");
+				bookingService.bookSeatUsingPessimisticLock(6L,2L);
+				System.out.println(Thread.currentThread().getName() + " successfully booked seat pessimistically");
+			} catch (Exception e) {
+				System.out.println(Thread.currentThread().getName() + " failed to book seat pessimistically : " + e.getMessage());
+			}
+		});
+
+		t1.start();
+		t2.start();
+		t1.join();
+		t2.join();
+	}
+
 }
